@@ -7,7 +7,7 @@ class CharRNN(Chain):
 
     def __init__(self, n_vocab, n_units):
         super(CharRNN, self).__init__(
-            embed = F.EmbedID(n_vocab, n_units),
+            embed = L.EmbedID(n_vocab, n_units),
             l1_x = L.Linear(n_units, 4*n_units),
             l1_h = L.Linear(n_units, 4*n_units),
             l2_h = L.Linear(n_units, 4*n_units),
