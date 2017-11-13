@@ -103,6 +103,7 @@ for i in xrange(jump * n_epochs):
         print '{}/{}, train_loss = {}, time = {:.2f}'.format((i+1)/bprop_len, jump, accum_loss.data / bprop_len, now-cur_at)
         cur_at = now
 
+        model.zerograds()
         accum_loss.backward()
         accum_loss.unchain_backward()  # truncate
         if args.gpu >= 0:
