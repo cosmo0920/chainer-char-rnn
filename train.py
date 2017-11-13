@@ -11,6 +11,7 @@ import codecs
 import numpy as np
 from chainer import cuda, Variable, Chain, optimizers
 import chainer.functions as F
+from chainer.optimizer import GradientClipping
 from CharRNN import CharRNN, make_initial_state
 
 # input data
@@ -70,6 +71,7 @@ if args.gpu >= 0:
 
 optimizer = optimizers.RMSprop(lr=args.learning_rate, alpha=args.decay_rate, eps=1e-8)
 optimizer.setup(model)
+optimizer.add_hook(GradientClipping(grad_clip))
 
 whole_len    = train_data.shape[0]
 jump         = whole_len / batchsize
