@@ -7,6 +7,7 @@ import cPickle as pickle
 import copy
 import os
 import codecs
+import cupy
 
 import numpy as np
 from chainer import cuda, Variable, Chain, optimizers
@@ -66,7 +67,7 @@ else:
     model = CharRNN(len(vocab), n_units)
 
 if args.gpu >= 0:
-    cuda.get_device(args.gpu).use()
+    cuda.get_device_from_id(args.gpu).use()
     model.to_gpu()
 
 optimizer = optimizers.RMSprop(lr=args.learning_rate, alpha=args.decay_rate, eps=1e-8)
@@ -80,7 +81,7 @@ start_at     = time.time()
 cur_at       = start_at
 state        = make_initial_state(n_units, batchsize=batchsize)
 if args.gpu >= 0:
-    accum_loss   = Variable(cuda.zeros(()))
+    accum_loss   = Variable(cupy.zeros((), dtype=cupy.float32))
     for key, value in state.items():
         value.data = cuda.to_gpu(value.data)
 else:
@@ -109,7 +110,7 @@ for i in xrange(jump * n_epochs):
         accum_loss.backward()
         accum_loss.unchain_backward()  # truncate
         if args.gpu >= 0:
-            accum_loss = Variable(cuda.zeros(()))
+            accum_loss = Variable(cupy.zeros((), dtype=cupy.float32))
         else:
             accum_loss = Variable(np.zeros((), dtype=np.float32))
 
