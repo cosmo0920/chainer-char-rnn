@@ -15,8 +15,8 @@ class CharRNN(Chain):
             l2_x = L.Linear(n_units, 4*n_units),
             l3   = L.Linear(n_units, n_vocab),
         )
-        for param in self.parameters:
-            param[:] = np.random.uniform(-0.08, 0.08, param.shape)
+        for param in self.params():
+            param.data[...] = np.random.uniform(-0.08, 0.08, param.data.shape)
 
     def forward_one_step(self, x_data, y_data, state, dropout_ratio=0.5):
         x = Variable(x_data)
