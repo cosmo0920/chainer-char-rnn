@@ -11,13 +11,14 @@ from chainer import cuda, Variable, Chain
 import chainer.functions as F
 from CharRNN import CharRNN, make_initial_state
 import sys
+from chainer import serializers
 
 
 # Make filepaths relative to settings.
 path = lambda root,*a: os.path.join(root, *a)
 ROOT = os.path.dirname(os.path.abspath(__file__))
 vocabulary = path(ROOT, "data", "tinyshakespeare", "vocab.bin")
-model      = path(ROOT, "cv", "latest.chainermodel")
+model_npz  = path(ROOT, "cv", "latest.chainermodel")
 
 
 def prediction(args, vocab="", model=""):
@@ -34,7 +35,8 @@ def prediction(args, vocab="", model=""):
 
     # load model
     if model == "":
-        model = pickle.load(open(args.model, 'rb'))
+        model = CharRNN(len(vocab), args.rnn_size)
+        serializers.load_npz(model_npz, model)
     n_units = model.embed.W.data.shape[1]
 
     if args.gpu >= 0:
@@ -81,9 +83,10 @@ def prediction(args, vocab="", model=""):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--model',      type=str,   default=model)
+    parser.add_argument('--model',      type=str,   default=model_npz)
     parser.add_argument('--vocabulary', type=str,   default=vocabulary)
 
+    parser.add_argument('--rnn_size',   type=int,   default=128)
     parser.add_argument('--seed',       type=int,   default=123)
     parser.add_argument('--sample',     type=int,   default=1)
     parser.add_argument('--primetext',  type=str,   default='')

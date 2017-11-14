@@ -14,6 +14,7 @@ from chainer import cuda, Variable, Chain, optimizers
 import chainer.functions as F
 from chainer.optimizer import GradientClipping
 from CharRNN import CharRNN, make_initial_state
+from chainer import serializers
 
 # input data
 def load_data(args):
@@ -118,8 +119,8 @@ for i in xrange(jump * n_epochs):
 
     if (i + 1) % 10000 == 0:
         fn = ('%s/charrnn_epoch_%.2f.chainermodel' % (args.checkpoint_dir, float(i)/jump))
-        pickle.dump(copy.deepcopy(model).to_cpu(), open(fn, 'wb'))
-        pickle.dump(copy.deepcopy(model).to_cpu(), open('%s/latest.chainermodel'%(args.checkpoint_dir), 'wb'))
+        serializers.save_npz(fn, copy.deepcopy(model).to_cpu())
+        serializers.save_npz('%s/latest.chainermodel'%(args.checkpoint_dir), copy.deepcopy(model).to_cpu())
 
     if (i + 1) % jump == 0:
         epoch += 1
